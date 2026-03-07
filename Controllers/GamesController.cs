@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ms_games.Events;
 using ms_games.Models;
-using ms_games.Publisher;
+using ms_games.Services;
 
 namespace ms_games.Controllers
 {
@@ -9,11 +8,11 @@ namespace ms_games.Controllers
   [Route("games")]
   public class GamesController : ControllerBase
   {
-    private readonly SqsPublisher _publisher;
+    private readonly GameService _service;
 
-    public GamesController(SqsPublisher publisher)
+    public GamesController(GameService service)
     {
-      _publisher = publisher;
+      _service = service;
     }
 
     [HttpGet]
@@ -21,23 +20,19 @@ namespace ms_games.Controllers
     {
       return Ok(new[]
       {
-                new { Id = "1", Name = "FIFA", Price = 199 },
-                new { Id = "2", Name = "COD", Price = 299 }
-            });
+        new { Id = "1", Name = "FIFA", Price = 199 },
+        new { Id = "2", Name = "COD", Price = 299 }
+      });
     }
 
     [HttpPost("{gameId}/buy")]
     public async Task<IActionResult> BuyGame(string gameId, [FromBody] BuyRequest request)
     {
-      var evt = new PurchaseRequestedEvent
-      {
-        UserId = request.UserId,
-        GameId = gameId,
-        Amount = request.Amount,
-        RequestedAt = DateTime.UtcNow
-      };
-
-      await _publisher.Publish(evt);
+      await _service.RequestPurchase(
+        request.UserId,
+        gameId,
+        request.Amount
+      );
 
       return Accepted(new
       {

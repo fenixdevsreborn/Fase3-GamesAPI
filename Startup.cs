@@ -16,7 +16,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
     services.AddAWSService<IAmazonSQS>();
-    services.AddSingleton<SqsPublisher>();
+    services.AddSingleton<EventPublisher>();
     services.AddControllers();
     }
 
