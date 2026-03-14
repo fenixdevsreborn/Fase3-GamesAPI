@@ -3,8 +3,5 @@
   "Fcg.Games.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Application",
   "Fcg.Games.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Contracts",
   "Fcg.Games.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Domain",
-  "Fcg.Games.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Infrastructure",
-  "Fcg.Shared.Auth, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Auth",
-  "Fcg.Shared.Observability.AspNetCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Observability.AspNetCore",
-  "Fcg.Shared.Observability, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Observability"
+  "Fcg.Games.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Infrastructure"
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Fcg.Games.Api\Fcg.Games.Api.csproj" />
     <ProjectReference Include="..\..\src\Fcg.Games.Application\Fcg.Games.Application.csproj" />
     <ProjectReference Include="..\..\src\Fcg.Games.Domain\Fcg.Games.Domain.csproj" />
   </ItemGroup>

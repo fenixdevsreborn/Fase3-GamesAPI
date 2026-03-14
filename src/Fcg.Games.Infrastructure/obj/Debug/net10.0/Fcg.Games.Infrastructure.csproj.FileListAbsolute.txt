@@ -66,7 +66,3 @@ E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\obj\De
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\obj\Debug\net10.0\Fcg.Games.Infrastructure.pdb
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\obj\Debug\net10.0\Fcg.Games.Infrastructure.genruntimeconfig.cache
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\obj\Debug\net10.0\ref\Fcg.Games.Infrastructure.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\bin\Debug\net10.0\Fcg.Shared.Observability.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.pdb
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Infrastructure\bin\Debug\net10.0\Fcg.Shared.Observability.pdb

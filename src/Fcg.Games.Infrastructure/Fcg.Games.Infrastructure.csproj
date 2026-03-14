@@ -26,7 +26,6 @@
     <ProjectReference Include="..\Fcg.Games.Application\Fcg.Games.Application.csproj" />
     <ProjectReference Include="..\Fcg.Games.Domain\Fcg.Games.Domain.csproj" />
     <ProjectReference Include="..\Fcg.Games.Contracts\Fcg.Games.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Fase3-Shared\src\Fcg.Shared.Observability.AspNetCore\Fcg.Shared.Observability.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

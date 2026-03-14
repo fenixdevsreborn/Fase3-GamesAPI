@@ -196,12 +196,6 @@ E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\obj\Debug\net10.0
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\obj\Debug\net10.0\Fcg.Games.Api.pdb
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\obj\Debug\net10.0\Fcg.Games.Api.genruntimeconfig.cache
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\obj\Debug\net10.0\ref\Fcg.Games.Api.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Auth.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Auth.pdb
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Observability.dll
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.pdb
-e:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Fcg.Shared.Observability.pdb
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Microsoft.Extensions.Http.Polly.dll
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Polly.dll
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\src\Fcg.Games.Api\bin\Debug\net10.0\Polly.Extensions.Http.dll

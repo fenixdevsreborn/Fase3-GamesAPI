@@ -491,10 +491,4 @@ E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\ob
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Microsoft.Extensions.Http.Polly.dll
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Polly.dll
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Polly.Extensions.Http.dll
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Auth.dll
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.dll
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Observability.dll
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Auth.pdb
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Observability.pdb
-E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Fcg.Shared.Observability.AspNetCore.pdb
 E:\02-Projects\019-FIAP\FASE3\Fase3-GamesAPI\tests\Fcg.Games.IntegrationTests\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore.dll

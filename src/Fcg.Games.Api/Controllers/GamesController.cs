@@ -1,10 +1,11 @@
+using Fcg.Games.Api.Authentication;
+using Fcg.Games.Api.Authorization;
+using Fcg.Games.Api.Observability;
+using Fcg.Games.Application.Exceptions;
+using Fcg.Games.Application.Services;
 using Fcg.Games.Contracts.Games;
 using Fcg.Games.Contracts.Paging;
 using Fcg.Games.Contracts.Payments;
-using Fcg.Games.Application.Services;
-using Fcg.Games.Application.Exceptions;
-using Fcg.Shared.Auth;
-using Fcg.Shared.Observability;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +32,7 @@ public class GamesController : ControllerBase
     // ----- Catalog (authenticated) -----
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Policy = FcgPolicies.RequireAuthenticatedUser)]
     [ProducesResponseType(typeof(PagedResponse<GameResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResponse<GameResponse>>> GetGames([FromQuery] GameListQuery query, CancellationToken ct)
     {
@@ -40,7 +41,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize]
+    [Authorize(Policy = FcgPolicies.RequireAuthenticatedUser)]
     [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponse>> GetById(Guid id, CancellationToken ct)
@@ -51,7 +52,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("search")]
-    [Authorize]
+    [Authorize(Policy = FcgPolicies.RequireAuthenticatedUser)]
     [ProducesResponseType(typeof(PagedResponse<GameResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResponse<GameResponse>>> Search([FromQuery] string? q, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
     {
@@ -59,7 +60,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpGet("recommendations")]
-    [Authorize]
+    [Authorize(Policy = FcgPolicies.RequireAuthenticatedUser)]
     [ProducesResponseType(typeof(IReadOnlyList<GameResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<GameResponse>>> GetRecommendations([FromQuery] int count = 10, CancellationToken ct = default)
     {
@@ -70,10 +71,10 @@ public class GamesController : ControllerBase
         return Ok(list);
     }
 
-    // ----- Purchase (authenticated, userId from JWT) -----
+    // ----- Purchase (authenticated; userId from JWT only) -----
 
     [HttpPost("{id:guid}/purchase")]
-    [Authorize]
+    [Authorize(Policy = FcgPolicies.RequireAuthenticatedUser)]
     [ProducesResponseType(typeof(PurchaseIntentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -101,7 +102,7 @@ public class GamesController : ControllerBase
     // ----- Admin -----
 
     [HttpPost]
-    [Authorize(Roles = FcgRoles.Admin)]
+    [Authorize(Policy = FcgPolicies.RequireAdmin)]
     [ProducesResponseType(typeof(GameResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -122,7 +123,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = FcgRoles.Admin)]
+    [Authorize(Policy = FcgPolicies.RequireAdmin)]
     [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -143,7 +144,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/price")]
-    [Authorize(Roles = FcgRoles.Admin)]
+    [Authorize(Policy = FcgPolicies.RequireAdmin)]
     [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponse>> UpdatePrice(Guid id, [FromBody] UpdatePriceRequest request, CancellationToken ct)
@@ -154,7 +155,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/publication")]
-    [Authorize(Roles = FcgRoles.Admin)]
+    [Authorize(Policy = FcgPolicies.RequireAdmin)]
     [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponse>> UpdatePublication(Guid id, [FromBody] UpdatePublicationRequest request, CancellationToken ct)
@@ -165,7 +166,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = FcgRoles.Admin)]
+    [Authorize(Policy = FcgPolicies.RequireAdmin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)

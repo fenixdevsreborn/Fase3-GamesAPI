@@ -1,9 +1,12 @@
 using System.Net;
 using System.Text.Json;
+using Fcg.Games.Api.Observability;
 using Fcg.Games.Application.Exceptions;
+using Microsoft.AspNetCore.Http;
 
 namespace Fcg.Games.Api.Middleware;
 
+/// <summary>Maps domain exceptions to HTTP JSON response. Logs with TraceId and CorrelationId.</summary>
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -29,18 +32,22 @@ public class ExceptionHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        // Generic messages in response to avoid leaking internal details (full message is still logged).
         var (statusCode, message) = exception switch
         {
-            NotFoundException => (HttpStatusCode.NotFound, exception.Message),
-            ConflictException => (HttpStatusCode.Conflict, exception.Message),
-            ArgumentException => (HttpStatusCode.BadRequest, exception.Message),
+            NotFoundException => (HttpStatusCode.NotFound, "Resource not found"),
+            ConflictException => (HttpStatusCode.Conflict, "Conflict"),
+            ArgumentException => (HttpStatusCode.BadRequest, "Bad request"),
             _ => (HttpStatusCode.InternalServerError, "An error occurred.")
         };
 
+        var traceId = ObservabilityContext.GetCurrentTraceId();
+        var correlationId = ObservabilityContext.GetCurrentCorrelationId();
+
         if ((int)statusCode >= 500)
-            _logger.LogError(exception, "Unhandled error: {Message}", exception.Message);
+            _logger.LogError(exception, "Unhandled error. {TraceId} {CorrelationId} {Message}", traceId, correlationId, exception.Message);
         else
-            _logger.LogWarning(exception, "Application error: {Message}", exception.Message);
+            _logger.LogWarning(exception, "Application error. {TraceId} {CorrelationId} {Message}", traceId, correlationId, exception.Message);
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;

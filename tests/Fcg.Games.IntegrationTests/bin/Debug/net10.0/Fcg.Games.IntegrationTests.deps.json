@@ -1047,8 +1047,7 @@
           "Fcg.Games.Application": "1.0.0",
           "Fcg.Games.Contracts": "1.0.0",
           "Fcg.Games.Infrastructure": "1.0.0",
-          "Fcg.Shared.Auth": "1.0.0",
-          "Fcg.Shared.Observability.AspNetCore": "1.0.0",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.3",
           "Microsoft.AspNetCore.OpenApi": "10.0.3",
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "10.0.0",
           "Microsoft.OpenApi": "2.0.0",
@@ -1106,7 +1105,6 @@
           "Fcg.Games.Application": "1.0.0",
           "Fcg.Games.Contracts": "1.0.0",
           "Fcg.Games.Domain": "1.0.0",
-          "Fcg.Shared.Observability.AspNetCore": "1.0.0",
           "Microsoft.AspNetCore.Http.Abstractions": "2.2.0",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Microsoft.EntityFrameworkCore.InMemory": "10.0.0",
@@ -1125,51 +1123,6 @@
         },
         "compile": {
           "Fcg.Games.Infrastructure.dll": {}
-        }
-      },
-      "Fcg.Shared.Auth/1.0.0": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.3",
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.3",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3"
-        },
-        "runtime": {
-          "Fcg.Shared.Auth.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        },
-        "compile": {
-          "Fcg.Shared.Auth.dll": {}
-        }
-      },
-      "Fcg.Shared.Observability/1.0.0": {
-        "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.3",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.3"
-        },
-        "runtime": {
-          "Fcg.Shared.Observability.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        },
-        "compile": {
-          "Fcg.Shared.Observability.dll": {}
-        }
-      },
-      "Fcg.Shared.Observability.AspNetCore/1.0.0": {
-        "dependencies": {
-          "Fcg.Shared.Observability": "1.0.0"
-        },
-        "runtime": {
-          "Fcg.Shared.Observability.AspNetCore.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        },
-        "compile": {
-          "Fcg.Shared.Observability.AspNetCore.dll": {}
         }
       },
       "Microsoft.AspNetCore.Antiforgery/10.0.0.0": {
@@ -3579,21 +3532,6 @@
       "sha512": ""
     },
     "Fcg.Games.Infrastructure/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Fcg.Shared.Auth/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Fcg.Shared.Observability/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Fcg.Shared.Observability.AspNetCore/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

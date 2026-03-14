@@ -55,6 +55,7 @@ dotnet ef database update --project src/Fcg.Games.Infrastructure --startup-proje
 - **Jwt:SigningKey** – mesma chave da Users API (mín. 32 caracteres)
 - **Jwt:Issuer**, **Jwt:Audience** – iguais à Users API
 - **PaymentsApi:BaseAddress**, **UseRealApi**, **StubCheckoutUrl**
+- **InternalApi:ApiKey** – chave para `POST /internal/library/add-from-payment` (uso apenas pela Payments API; rede restrita)
 
 ## Executar
 
@@ -106,6 +107,14 @@ Obtenha o token na Users API: `POST /auth/login` com `email` e `password`. Use n
   Status: Owned, Wishlist, Favorite, Hidden, Archived
 - **PUT /me/library/{id}** – body `{ "status": "...", "notes": "..." }`
 - **DELETE /me/library/{id}** – remover
+
+### Endpoint interno (não usar com JWT)
+
+- **POST /internal/library/add-from-payment** – adiciona jogo à biblioteca de um usuário após pagamento aprovado.  
+  **Proteção:** apenas header `X-Api-Key` (não usa JWT).  
+  **Body:** `{ "userId": "guid", "gameId": "guid" }`.  
+  **Uso:** chamado pela Payments API após confirmação de pagamento.  
+  **Segurança:** use API key forte (`InternalApi:ApiKey`), restrinja o tráfego à rede interna/VPC e não exponha este endpoint à internet.
 
 ### Compra (autenticado, userId do JWT)
 

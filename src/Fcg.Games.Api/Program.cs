@@ -1,5 +1,7 @@
-using Fcg.Shared.Auth;
-using Fcg.Shared.Observability;
+using Fcg.Games.Api.Extensions;
+using Fcg.Games.Api.Middleware;
+using Fcg.Games.Api.Observability;
+using Fcg.Games.Api.OpenApi;
 using Fcg.Games.Infrastructure.Extensions;
 using Fcg.Games.Infrastructure.Persistence;
 using Microsoft.AspNetCore.OpenApi;
@@ -16,10 +18,10 @@ builder.Logging.AddDebug();
 
 builder.Services.Configure<Fcg.Games.Api.Controllers.InternalApiOptions>(
     builder.Configuration.GetSection(Fcg.Games.Api.Controllers.InternalApiOptions.SectionName));
-builder.Services.AddGamesInfrastructure(builder.Configuration, builder.Environment);
-builder.Services.AddFcgJwtBearer(builder.Configuration);
-builder.Services.AddFcgAuthorization();
-builder.Services.AddProjectObservability(builder.Configuration, "Fcg.Games.Api");
+builder.Services.AddGamesInfrastructure(builder.Configuration, builder.Environment,
+    clientBuilder => clientBuilder.AddHttpMessageHandler<ObservabilityDelegatingHandler>());
+builder.Services.AddGamesApiAuth(builder.Configuration);
+builder.Services.AddGamesApiObservability(builder.Configuration, "Fcg.Games.Api");
 builder.Services.AddControllers();
 
 builder.Services.AddHealthChecks()
@@ -35,13 +37,13 @@ builder.Services.AddOpenApi(options =>
         document.Info.Description = "Game catalog, library, and purchase for FCG Cloud Platform. JWT from Users API.";
         return Task.CompletedTask;
     });
-    options.AddDocumentTransformer<Fcg.Games.Api.OpenApi.BearerSecuritySchemeTransformer>();
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
 });
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseFcgObservability();
-app.UseMiddleware<Fcg.Games.Api.Middleware.ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

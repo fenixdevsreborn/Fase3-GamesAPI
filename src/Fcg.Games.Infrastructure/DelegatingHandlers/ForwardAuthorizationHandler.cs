@@ -15,7 +15,7 @@ public sealed class ForwardAuthorizationHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var context = _httpContextAccessor.HttpContext;
-        var authHeader = context?.Request.Headers.Authorization.FirstOrDefault();
+        var authHeader = context?.Request.Headers["Authorization"].FirstOrDefault();
         if (!string.IsNullOrEmpty(authHeader))
             request.Headers.TryAddWithoutValidation("Authorization", authHeader);
 

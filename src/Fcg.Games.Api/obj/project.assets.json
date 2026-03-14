@@ -1425,7 +1425,6 @@
           "Fcg.Games.Application": "1.0.0",
           "Fcg.Games.Contracts": "1.0.0",
           "Fcg.Games.Domain": "1.0.0",
-          "Fcg.Shared.Observability.AspNetCore": "1.0.0",
           "Microsoft.EntityFrameworkCore": "10.0.0",
           "Microsoft.EntityFrameworkCore.InMemory": "10.0.0",
           "Microsoft.Extensions.Http.Polly": "10.0.0",
@@ -1438,45 +1437,6 @@
         "runtime": {
           "bin/placeholder/Fcg.Games.Infrastructure.dll": {}
         }
-      },
-      "Fcg.Shared.Auth/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.3"
-        },
-        "compile": {
-          "bin/placeholder/Fcg.Shared.Auth.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Fcg.Shared.Auth.dll": {}
-        }
-      },
-      "Fcg.Shared.Observability/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "compile": {
-          "bin/placeholder/Fcg.Shared.Observability.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Fcg.Shared.Observability.dll": {}
-        }
-      },
-      "Fcg.Shared.Observability.AspNetCore/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Fcg.Shared.Observability": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/Fcg.Shared.Observability.AspNetCore.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Fcg.Shared.Observability.AspNetCore.dll": {}
-        },
-        "frameworkReferences": [
-          "Microsoft.AspNetCore.App"
-        ]
       }
     }
   },
@@ -3630,21 +3590,6 @@
       "type": "project",
       "path": "../Fcg.Games.Infrastructure/Fcg.Games.Infrastructure.csproj",
       "msbuildProject": "../Fcg.Games.Infrastructure/Fcg.Games.Infrastructure.csproj"
-    },
-    "Fcg.Shared.Auth/1.0.0": {
-      "type": "project",
-      "path": "../../../Fase3-Shared/src/Fcg.Shared.Auth/Fcg.Shared.Auth.csproj",
-      "msbuildProject": "../../../Fase3-Shared/src/Fcg.Shared.Auth/Fcg.Shared.Auth.csproj"
-    },
-    "Fcg.Shared.Observability/1.0.0": {
-      "type": "project",
-      "path": "../../../Fase3-Shared/src/Fcg.Shared.Observability/Fcg.Shared.Observability.csproj",
-      "msbuildProject": "../../../Fase3-Shared/src/Fcg.Shared.Observability/Fcg.Shared.Observability.csproj"
-    },
-    "Fcg.Shared.Observability.AspNetCore/1.0.0": {
-      "type": "project",
-      "path": "../../../Fase3-Shared/src/Fcg.Shared.Observability.AspNetCore/Fcg.Shared.Observability.AspNetCore.csproj",
-      "msbuildProject": "../../../Fase3-Shared/src/Fcg.Shared.Observability.AspNetCore/Fcg.Shared.Observability.AspNetCore.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3652,8 +3597,7 @@
       "Fcg.Games.Application >= 1.0.0",
       "Fcg.Games.Contracts >= 1.0.0",
       "Fcg.Games.Infrastructure >= 1.0.0",
-      "Fcg.Shared.Auth >= 1.0.0",
-      "Fcg.Shared.Observability.AspNetCore >= 1.0.0",
+      "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.3",
       "Microsoft.AspNetCore.OpenApi >= 10.0.3",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.0",
       "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore >= 10.0.0",
@@ -3702,12 +3646,6 @@
             },
             "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Infrastructure\\Fcg.Games.Infrastructure.csproj": {
               "projectPath": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Infrastructure\\Fcg.Games.Infrastructure.csproj"
-            },
-            "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Auth\\Fcg.Shared.Auth.csproj": {
-              "projectPath": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Auth\\Fcg.Shared.Auth.csproj"
-            },
-            "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Observability.AspNetCore\\Fcg.Shared.Observability.AspNetCore.csproj": {
-              "projectPath": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-Shared\\src\\Fcg.Shared.Observability.AspNetCore\\Fcg.Shared.Observability.AspNetCore.csproj"
             }
           }
         }
@@ -3728,6 +3666,10 @@
       "net10.0": {
         "targetAlias": "net10.0",
         "dependencies": {
+          "Microsoft.AspNetCore.Authentication.JwtBearer": {
+            "target": "Package",
+            "version": "[10.0.3, )"
+          },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.3, )"

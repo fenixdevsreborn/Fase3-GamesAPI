@@ -19,7 +19,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddGamesInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration,
-        IHostEnvironment? hostEnvironment = null)
+        IHostEnvironment? hostEnvironment = null,
+        Action<IHttpClientBuilder>? configurePaymentsHttpClient = null)
     {
         var useInMemory = configuration.GetValue<bool>("UseInMemoryDatabase")
             || string.Equals(hostEnvironment?.EnvironmentName, "Testing", StringComparison.OrdinalIgnoreCase);
@@ -41,9 +42,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILibraryService, LibraryService>();
         services.AddScoped<IPurchaseService, PurchaseService>();
 
-        services.AddHttpClient<IPaymentsApiClient, PaymentsApiClient>()
+        var paymentsClientBuilder = services.AddHttpClient<IPaymentsApiClient, PaymentsApiClient>()
             .AddHttpMessageHandler<ForwardAuthorizationHandler>()
-            .AddHttpMessageHandler<Fcg.Shared.Observability.ObservabilityDelegatingHandler>()
             .ConfigureHttpClient((sp, client) =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
@@ -54,6 +54,8 @@ public static class ServiceCollectionExtensions
             })
             .AddPolicyHandler(GetPaymentsRetryPolicy())
             .AddPolicyHandler(Policy.TimeoutAsync<HttpResponseMessage>(TimeSpan.FromSeconds(15)));
+
+        configurePaymentsHttpClient?.Invoke(paymentsClientBuilder);
 
         return services;
     }
