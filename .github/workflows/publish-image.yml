@@ -44,8 +44,8 @@ jobs:
         run: |
           REGISTRY="${{ steps.ecr.outputs.registry }}"
           REPO="${{ vars.ECR_REPOSITORY_NAME || 'fcg/fase03' }}"
-          echo "tags=${REGISTRY}/${REPO}:latest" >> $GITHUB_OUTPUT
-          echo "image_tag=games-api:latest" >> $GITHUB_OUTPUT
+          echo "tags=${REGISTRY}/${REPO}:games-api-latest" >> $GITHUB_OUTPUT
+          echo "image_tag=games-api:games-api-latest" >> $GITHUB_OUTPUT
 
       - name: Build image
         run: docker build -f Dockerfile -t ${{ steps.meta.outputs.tags }} .
