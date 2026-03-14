@@ -1,5 +1,8 @@
-﻿using Amazon.SQS;
+﻿using Amazon.DynamoDBv2;
+using Amazon.SQS;
 using ms_games.Publisher;
+using ms_games.Repositories;
+using ms_games.Services;
 
 namespace ms_games;
 
@@ -15,9 +18,15 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
-    services.AddAWSService<IAmazonSQS>();
-    services.AddSingleton<EventPublisher>();
-    services.AddControllers();
+      services.AddControllers();
+
+      services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+      services.AddAWSService<IAmazonSQS>();
+      services.AddAWSService<IAmazonDynamoDB>();
+
+      services.AddScoped<EventPublisher>();
+      services.AddScoped<GameService>();
+      services.AddScoped<GameRepository>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

@@ -5,6 +5,26 @@
 
   "Resources": {
 
+    "GamesTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "Game",
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "Id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "Id",
+            "KeyType": "HASH"
+          }
+        ]
+      }
+    },
+
     "GamesApi": {
       "Type": "AWS::Serverless::Api",
       "Properties": {
@@ -34,12 +54,33 @@
             "SQSSendMessagePolicy": {
               "QueueName": "payment-queue"
             }
+          },
+          {
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:GetItem",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:DeleteItem",
+                  "dynamodb:Scan",
+                  "dynamodb:Query",
+                  "dynamodb:DescribeTable"
+                ],
+                "Resource": {
+                  "Fn::GetAtt": [ "GamesTable", "Arn" ]
+                }
+              }
+            ]
           }
         ],
 
         "Environment": {
           "Variables": {
-            "PAYMENT_QUEUE_URL": "https://sqs.us-east-1.amazonaws.com/864899865331/payment-queue"
+            "PAYMENT_QUEUE_URL": "https://sqs.us-east-1.amazonaws.com/864899865331/payment-queue",
+            "NOTIFICATION_QUEUE_URL": "https://sqs.us-east-1.amazonaws.com/864899865331/notification-queue",
+            "GAMES_TABLE": "Game"
           }
         },
 
@@ -60,6 +101,33 @@
               "RestApiId": { "Ref": "GamesApi" },
               "Path": "/games/{id}",
               "Method": "GET"
+            }
+          },
+
+          "CreateGame": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "GamesApi" },
+              "Path": "/games",
+              "Method": "POST"
+            }
+          },
+
+          "UpdateGame": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "GamesApi" },
+              "Path": "/games/{id}",
+              "Method": "PUT"
+            }
+          },
+
+          "DeleteGame": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "GamesApi" },
+              "Path": "/games/{id}",
+              "Method": "DELETE"
             }
           },
 

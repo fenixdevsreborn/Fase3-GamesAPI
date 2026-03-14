@@ -1,23 +1,60 @@
-﻿using ms_games.Events;
+﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using ms_games.Events;
+using ms_games.Models;
 using ms_games.Publisher;
 
 namespace ms_games.Services
 {
   public class GameService
   {
+    private readonly DynamoDBContext _context;
     private readonly EventPublisher _publisher;
+    private readonly string _table;
 
-    public GameService(EventPublisher publisher)
+    public GameService(IAmazonDynamoDB dynamo, EventPublisher publisher)
     {
+      _context = new DynamoDBContext(dynamo);
       _publisher = publisher;
+      _table = Environment.GetEnvironmentVariable("GAMES_TABLE");
     }
 
-    public async Task RequestPurchase(string userId, string gameId, decimal amount)
+    public async Task<List<Game>> GetAll()
+    {
+      return await _context.ScanAsync<Game>(new List<ScanCondition>()).GetRemainingAsync();
+    }
+
+    public async Task<Game> GetById(string id)
+    {
+      return await _context.LoadAsync<Game>(id);
+    }
+
+    public async Task Create(Game game)
+    {
+      game.Id = Guid.NewGuid().ToString();
+      await _context.SaveAsync(game);
+    }
+
+    public async Task Update(string id, Game game)
+    {
+      game.Id = id;
+      await _context.SaveAsync(game);
+    }
+
+    public async Task Delete(string id)
+    {
+      await _context.DeleteAsync<Game>(id);
+    }
+
+    public async Task RequestPurchase(string userId, string email, string gameId, string gameName, decimal gameValue, decimal amount)
     {
       var evt = new PurchaseRequestedEvent
       {
         UserId = userId,
+        Email = email,
         GameId = gameId,
+        GameName = gameName,
+        GameValue = gameValue,
         Amount = amount,
         RequestedAt = DateTime.UtcNow
       };
