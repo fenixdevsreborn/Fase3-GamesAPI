@@ -27,8 +27,8 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(e => e.Tags)
             .HasColumnName("tags")
             .HasConversion(
-                v => JsonSerializer.Serialize(v),
-                v => JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>())
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>())
             .HasMaxLength(2000);
 
         builder.Property(e => e.IsPublished).HasColumnName("is_published").IsRequired();
