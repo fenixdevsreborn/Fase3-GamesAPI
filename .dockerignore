@@ -1,0 +1,8 @@
+# Evita copiar artefatos de build do host (Windows) que contêm caminhos
+# como C:\Program Files\... e quebram o publish no Linux.
+**/obj
+**/bin
+**/.vs
+**/*.user
+*.suo
+*.cache
