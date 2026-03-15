@@ -10,12 +10,15 @@ public class WebAppFixture : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
-        builder.ConfigureAppConfiguration((_, config) =>
+        builder.ConfigureAppConfiguration((context, config) =>
         {
+            var authority = TestOidcServer.BaseUrl;
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["UseInMemoryDatabase"] = "true",
-                ["Jwt:SigningKey"] = "integration-test-signing-key-32-chars-long!",
+                ["Jwt:Authority"] = authority,
+                ["Jwt:Audience"] = "fcg-cloud-platform",
+                ["Jwt:RequireHttpsMetadata"] = "false",
                 ["InternalApi:ApiKey"] = "test-internal-api-key"
             });
         });

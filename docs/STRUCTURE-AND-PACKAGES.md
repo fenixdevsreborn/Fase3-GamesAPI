@@ -1,5 +1,7 @@
 # Fase3-GamesAPI — Estrutura e pacotes
 
+Autenticação JWT (Authority + JWKS da Users API): **[docs/JWT-AUTHENTICATION.md](JWT-AUTHENTICATION.md)**.
+
 ## Árvore final de pastas (principais)
 
 ```
@@ -11,8 +13,10 @@ Fase3-GamesAPI/
 │   │   │   ├── FcgRoles.cs
 │   │   │   ├── FcgScopes.cs
 │   │   │   ├── FcgPolicies.cs
-│   │   │   ├── JwtOptions.cs
-│   │   │   └── JwtBearerExtensions.cs          # Validação JWT (token da Users API)
+│   │   │   ├── JwtOptions.cs                  # Authority, Audience, RequireHttpsMetadata, MetadataRequestTimeoutSeconds
+│   │   │   ├── JwtBearerExtensions.cs         # AddFcgJwtBearer (Authority + JWKS)
+│   │   │   ├── JwtBearerPostConfigureOptions.cs
+│   │   │   └── IBackchannelHttpHandlerFactory.cs  # Opcional (testes)
 │   │   ├── Authorization/
 │   │   │   ├── AuthorizationExtensions.cs      # AddFcgAuthorization, RequireScope
 │   │   │   ├── UserClaimsExtensions.cs         # GetUserId, GetRole, IsAdmin, HasScope
@@ -60,8 +64,9 @@ Fase3-GamesAPI/
 │   │   ├── Observability/
 │   │   │   └── FcgMetersTests.cs
 │   │   └── Services/
-│   └── Fcg.Games.IntegrationTests/
+│   └── Fcg.Games.IntegrationTests/   # WebAppFixture, TestOidcServer (HttpListener), GamesIntegrationTests
 └── docs/
+    ├── JWT-AUTHENTICATION.md         # Como a Games API confia na Users API (Authority, JWKS)
     └── STRUCTURE-AND-PACKAGES.md
 ```
 

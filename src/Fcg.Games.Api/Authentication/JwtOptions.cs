@@ -1,14 +1,22 @@
 namespace Fcg.Games.Api.Authentication;
 
-/// <summary>JWT configuration for validation (token emitted by Users API). Same section name and defaults.</summary>
+/// <summary>JWT validation configuration: Authority (Users API URL), Audience, metadata and backchannel. No signing key — keys from JWKS.</summary>
 public class JwtOptions
 {
     public const string SectionName = "Jwt";
 
-    public string Issuer { get; set; } = "Fcg.Users.Api";
-    public string Audience { get; set; } = "fcg-cloud-platform";
-    public string SigningKey { get; set; } = string.Empty;
-    public int ExpirationSeconds { get; set; } = 3600;
+    /// <summary>Issuer/Authority URL of the Users API (e.g. https://users-api.example.com). Metadata at Authority/.well-known/openid-configuration.</summary>
+    public string Authority { get; set; } = string.Empty;
 
-    public const int MinSigningKeyLength = 32;
+    /// <summary>Explicit metadata URL; if empty, derived from Authority + /.well-known/openid-configuration.</summary>
+    public string? MetadataAddress { get; set; }
+
+    /// <summary>Expected audience (e.g. fcg-cloud-platform). Must match Users API.</summary>
+    public string Audience { get; set; } = "fcg-cloud-platform";
+
+    /// <summary>Require HTTPS for metadata. Set false only for local development (e.g. http://localhost).</summary>
+    public bool RequireHttpsMetadata { get; set; } = true;
+
+    /// <summary>Timeout for metadata/JWKS HTTP requests.</summary>
+    public int MetadataRequestTimeoutSeconds { get; set; } = 10;
 }

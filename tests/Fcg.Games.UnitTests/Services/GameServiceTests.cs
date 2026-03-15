@@ -4,28 +4,28 @@ using Fcg.Games.Contracts.Games;
 using Fcg.Games.Domain.Entities;
 using Fcg.Games.Domain.Paging;
 using Fcg.Games.Domain.Repositories;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Fcg.Games.UnitTests.Services;
 
 public class GameServiceTests
 {
-    private readonly Mock<IGameRepository> _repo = new();
+    private readonly IGameRepository _repo = Substitute.For<IGameRepository>();
 
     [Fact]
     public async Task GetByIdAsync_WhenNotFound_ReturnsNull()
     {
-        _repo.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), false, It.IsAny<CancellationToken>())).ReturnsAsync((Game?)null);
-        var sut = new GameService(_repo.Object);
+        _repo.GetByIdAsync(Arg.Any<Guid>(), false, Arg.Any<CancellationToken>()).Returns((Game?)null);
+        var sut = new GameService(_repo);
         Assert.Null(await sut.GetByIdAsync(Guid.NewGuid()));
     }
 
     [Fact]
     public async Task CreateGameAsync_WhenSlugExists_ThrowsConflict()
     {
-        _repo.Setup(r => r.ExistsBySlugAsync(It.IsAny<string>(), null, It.IsAny<CancellationToken>())).ReturnsAsync(true);
-        var sut = new GameService(_repo.Object);
+        _repo.ExistsBySlugAsync(Arg.Any<string>(), null, Arg.Any<CancellationToken>()).Returns(true);
+        var sut = new GameService(_repo);
         var request = new CreateGameRequest { Title = "Test Game", Price = 10 };
         await Assert.ThrowsAsync<ConflictException>(() => sut.CreateGameAsync(request));
     }
@@ -44,9 +44,9 @@ public class GameServiceTests
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-        _repo.Setup(r => r.GetRecommendationsAsync(null, 10, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Game> { game });
-        var sut = new GameService(_repo.Object);
+        _repo.GetRecommendationsAsync(null, 10, Arg.Any<CancellationToken>())
+            .Returns(new List<Game> { game });
+        var sut = new GameService(_repo);
         var result = await sut.GetRecommendationsAsync(null, 10);
         Assert.Single(result);
         Assert.Equal(game.Id, result[0].Id);

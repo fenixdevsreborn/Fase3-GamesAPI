@@ -32,7 +32,6 @@ public class ExceptionHandlingMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        // Generic messages in response to avoid leaking internal details (full message is still logged).
         var (statusCode, message) = exception switch
         {
             NotFoundException => (HttpStatusCode.NotFound, "Resource not found"),

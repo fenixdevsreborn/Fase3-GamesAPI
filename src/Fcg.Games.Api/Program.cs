@@ -22,6 +22,7 @@ builder.Services.AddGamesInfrastructure(builder.Configuration, builder.Environme
     clientBuilder => clientBuilder.AddHttpMessageHandler<ObservabilityDelegatingHandler>());
 builder.Services.AddGamesApiAuth(builder.Configuration);
 builder.Services.AddGamesApiObservability(builder.Configuration, "Fcg.Games.Api");
+builder.Services.AddOpenTelemetryObservability(builder.Configuration);
 builder.Services.AddControllers();
 
 builder.Services.AddHealthChecks()

@@ -22,6 +22,16 @@ public class GamesIntegrationTests : IClassFixture<WebAppFixture>
     }
 
     [Fact]
+    public async Task GetGames_WithValidToken_Returns200()
+    {
+        var token = TestOidcServer.CreateToken();
+        var request = new HttpRequestMessage(HttpMethod.Get, "/games");
+        request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + token);
+        var response = await _client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
     public async Task OpenApiDocument_Returns200()
     {
         var response = await _client.GetAsync("/openapi/v1.json");
