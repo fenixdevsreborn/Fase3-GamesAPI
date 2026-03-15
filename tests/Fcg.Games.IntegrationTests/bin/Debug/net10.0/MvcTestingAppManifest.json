@@ -1,7 +1,0 @@
-{
-  "Fcg.Games.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Api",
-  "Fcg.Games.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Application",
-  "Fcg.Games.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Contracts",
-  "Fcg.Games.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Domain",
-  "Fcg.Games.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\02-Projects\\019-FIAP\\FASE3\\Fase3-GamesAPI\\src\\Fcg.Games.Infrastructure"
-}
