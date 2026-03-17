@@ -1,0 +1,38 @@
+# PostgreSQL 17 sobe primeiro (com persistência); a API sobe depois e conecta em Host=postgres.
+# Build: docker compose build
+# Run:   docker compose up -d
+
+services:
+  postgres:
+    image: postgres:17-bookworm
+    container_name: fcg-games-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fcg_games
+    ports:
+      - "5432:5432"
+    volumes:
+      - games_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fcg_games"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fcg.games.api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__GamesDb: "Host=postgres;Database=fcg_games;Username=postgres;Password=postgres;Include Error Detail=true"
+    ports:
+      - "8080:8080"
+
+volumes:
+  games_pgdata:

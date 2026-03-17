@@ -57,6 +57,30 @@ dotnet ef database update --project src/Fcg.Games.Infrastructure --startup-proje
 - **PaymentsApi:BaseAddress**, **UseRealApi**, **StubCheckoutUrl**
 - **InternalApi:ApiKey** – chave para `POST /internal/library/add-from-payment` (uso apenas pela Payments API; rede restrita)
 
+## Docker
+
+### Docker Compose (PostgreSQL 17 + API)
+
+O `docker-compose.yml` sobe **dois containers**: primeiro o **PostgreSQL 17** (com volume persistente), depois a **API** (que só inicia após o Postgres estar saudável).
+
+- **postgres**: imagem `postgres:17-bookworm`, volume `games_pgdata` para persistência, healthcheck; sobe primeiro.
+- **fcg.games.api**: depende de `postgres` com `condition: service_healthy`; conecta em `Host=postgres`.
+
+```bash
+# Build e execução (Postgres sobe primeiro, depois a API)
+docker compose build
+docker compose up -d
+
+# API em http://localhost:8080 | Postgres em localhost:5432 (usuário/senha: postgres, database: fcg_games)
+docker compose logs -f
+```
+
+Para rodar mais de uma API ao mesmo tempo na mesma máquina, altere a porta do Postgres em um dos compose (ex.: `"5433:5432"`) para evitar conflito.
+
+### Dockerfile.postgres (all-in-one)
+
+Para deploy em que a task roda um único container com API + Postgres (ex.: ECS), use `Dockerfile.postgres` (imagem base `postgres:17-bookworm`).
+
 ## Executar
 
 ```bash
