@@ -74,7 +74,12 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<GamesDbContext>();
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     if (!config.GetValue<bool>("UseInMemoryDatabase"))
+    {
+        var connectionString = config.GetConnectionString("GamesDb")
+            ?? throw new InvalidOperationException("ConnectionStrings:GamesDb is required.");
+        await PostgresDatabaseEnsurer.EnsureExistsAsync(connectionString);
         await db.Database.MigrateAsync();
+    }
 }
 
 app.Run();

@@ -1,0 +1,32 @@
+# Build — context = raiz do repositório do serviço.
+FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+WORKDIR /src
+
+COPY src/Fcg.Games.Api/Fcg.Games.Api.csproj src/Fcg.Games.Api/
+COPY src/Fcg.Games.Application/Fcg.Games.Application.csproj src/Fcg.Games.Application/
+COPY src/Fcg.Games.Contracts/Fcg.Games.Contracts.csproj src/Fcg.Games.Contracts/
+COPY src/Fcg.Games.Domain/Fcg.Games.Domain.csproj src/Fcg.Games.Domain/
+COPY src/Fcg.Games.Infrastructure/Fcg.Games.Infrastructure.csproj src/Fcg.Games.Infrastructure/
+
+RUN dotnet restore src/Fcg.Games.Api/Fcg.Games.Api.csproj
+COPY src src
+RUN dotnet publish src/Fcg.Games.Api/Fcg.Games.Api.csproj -c Release -o /app/publish --no-restore
+
+# Runtime: Postgres + .NET na mesma imagem (runtime copiado da imagem oficial para compatibilidade com 10.0-preview)
+FROM postgres:16-bookworm
+COPY --from=mcr.microsoft.com/dotnet/aspnet:10.0-preview /usr/share/dotnet /usr/share/dotnet
+ENV PATH="${PATH}:/usr/share/dotnet"
+
+ENV POSTGRES_USER=postgres \
+    POSTGRES_PASSWORD=postgres \
+    ASPNETCORE_URLS=http://+:8080
+
+WORKDIR /app
+COPY --from=build /app/publish .
+COPY docker/entrypoint.sh /docker/entrypoint.sh
+RUN chmod +x /docker/entrypoint.sh
+
+EXPOSE 8080
+
+ENTRYPOINT ["/docker/entrypoint.sh"]
+CMD ["dotnet", "Fcg.Games.Api.dll"]
