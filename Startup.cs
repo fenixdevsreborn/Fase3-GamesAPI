@@ -1,5 +1,7 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.SQS;
+using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using ms_games.Observability;
 using ms_games.Publisher;
 using ms_games.Repositories;
 using ms_games.Services;
@@ -27,6 +29,8 @@ public class Startup
       services.AddScoped<EventPublisher>();
       services.AddScoped<GameService>();
       services.AddScoped<GameRepository>();
+
+      AWSSDKHandler.RegisterXRayForAllServices();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -40,6 +44,8 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseRouting();
+
+        app.UseMiddleware<XRayMiddleware>();
 
         app.UseAuthorization();
 
