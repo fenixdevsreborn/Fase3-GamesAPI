@@ -72,6 +72,14 @@
                 "Resource": {
                   "Fn::GetAtt": [ "GamesTable", "Arn" ]
                 }
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "xray:PutTraceSegments",
+                  "xray:PutTelemetryRecords"
+                ],
+                "Resource": "*"
               }
             ]
           }
