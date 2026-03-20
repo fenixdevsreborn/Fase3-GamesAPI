@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using ms_games.Models;
 using ms_games.Services;
 
@@ -72,5 +73,19 @@ public class GamesController : ControllerBase
       GameId = gameId,
       Amount = request.Amount
     });
+  }
+
+  [HttpGet("{gameId}/recommendations")]
+  public async Task<IActionResult> GetRecommendations(string gameId, [FromQuery] int count = 3)
+  {
+    var userId = User.FindFirst("sub")?.Value;
+    var email = User.FindFirst("email")?.Value;
+
+    if (userId == null || email == null)
+      return Unauthorized();
+
+    var recommendations = await _service.GetRecommendation(gameId);
+
+    return Ok(recommendations);
   }
 }

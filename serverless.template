@@ -147,6 +147,15 @@
               "Path": "/games/{id}/buy",
               "Method": "POST"
             }
+          },
+
+          "GetRecommendations": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "GamesApi" },
+              "Path": "/games/{id}/recommendations",
+              "Method": "GET"
+            }
           }
         }
       }
