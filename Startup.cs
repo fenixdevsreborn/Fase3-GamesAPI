@@ -126,16 +126,21 @@ public class Startup
         throw new InvalidOperationException("JWT Secret is not configured");
       }
 
-      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
+      {
+        KeyId = Configuration["Jwt:KeyId"] ?? "ms-users-api-signing-key"
+      };
 
       services.AddAuthentication("Bearer")
         .AddJwtBearer("Bearer", options =>
         {
+          options.MapInboundClaims = false;
           options.RequireHttpsMetadata = false;
           options.TokenValidationParameters = new TokenValidationParameters
           {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = key,
+            IssuerSigningKeyResolver = (token, securityToken, kid, validationParameters) => new[] { key },
             ValidateIssuer = !string.IsNullOrEmpty(jwtIssuer),
             ValidIssuer = jwtIssuer,
             ValidateAudience = !string.IsNullOrEmpty(jwtAudience),
@@ -144,6 +149,21 @@ public class Startup
             ClockSkew = TimeSpan.FromSeconds(5),
             NameClaimType = "sub",
             RoleClaimType = "role"
+          };
+
+          options.Events = new JwtBearerEvents
+          {
+            OnAuthenticationFailed = context =>
+            {
+              Console.WriteLine("Games API JWT authentication failed: " + context.Exception.Message);
+              return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+              var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
+              Console.WriteLine("Games API JWT token validated. Claims: " + string.Join(", ", claims ?? Array.Empty<string>()));
+              return Task.CompletedTask;
+            }
           };
         });
 

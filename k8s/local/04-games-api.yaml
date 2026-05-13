@@ -56,6 +56,11 @@ spec:
             secretKeyRef:
               name: games-api-secrets
               key: jwt-audience
+        - name: Jwt__KeyId
+          valueFrom:
+            secretKeyRef:
+              name: games-api-secrets
+              key: jwt-key-id
         - name: RabbitMq__Host
           value: rabbitmq
         - name: RabbitMq__Port

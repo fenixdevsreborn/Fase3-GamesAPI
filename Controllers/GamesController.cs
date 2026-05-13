@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ms_games.Models;
 using ms_games.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 [ApiController]
 [Route("games")]
@@ -51,8 +53,8 @@ public class GamesController : ControllerBase
   [HttpPost("{gameId}/buy")]
   public async Task<IActionResult> BuyGame(string gameId, [FromBody] BuyRequest request)
   {
-    var userId = User.FindFirst("sub")?.Value;
-    var email = User.FindFirst("email")?.Value;
+    var userId = GetUserId();
+    var email = GetUserEmail();
 
     if (userId == null || email == null)
       return Unauthorized();
@@ -80,8 +82,8 @@ public class GamesController : ControllerBase
   [HttpGet("{gameId}/recommendations")]
   public async Task<IActionResult> GetRecommendations(string gameId, [FromQuery] int count = 3)
   {
-    var userId = User.FindFirst("sub")?.Value;
-    var email = User.FindFirst("email")?.Value;
+    var userId = GetUserId();
+    var email = GetUserEmail();
 
     if (userId == null || email == null)
       return Unauthorized();
@@ -89,5 +91,19 @@ public class GamesController : ControllerBase
     var recommendations = await _service.GetRecommendation(gameId, count);
 
     return Ok(recommendations);
+  }
+
+  private string? GetUserId()
+  {
+    return User.FindFirst("sub")?.Value
+      ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+      ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+  }
+
+  private string? GetUserEmail()
+  {
+    return User.FindFirst("email")?.Value
+      ?? User.FindFirst(ClaimTypes.Email)?.Value
+      ?? User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
   }
 }
