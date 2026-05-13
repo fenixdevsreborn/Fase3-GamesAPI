@@ -31,6 +31,7 @@ jobs:
         run: |
           kubectl apply -f k8s/eks/00-namespace.yaml
           kubectl apply -f k8s/eks/01-secrets.yaml
+          kubectl apply -f k8s/eks/01-rabbitmq-secrets.yaml
           kubectl apply -f k8s/eks/02-serviceaccount.yaml
           kubectl annotate serviceaccount games-api eks.amazonaws.com/role-arn="${{ secrets.GAMES_API_ROLE_ARN }}" -n fase4 --overwrite
           kubectl apply -f k8s/eks/03-rabbitmq.yaml

@@ -1,7 +1,7 @@
 variable "project_name" {
   description = "Nome base usado nos recursos AWS."
   type        = string
-  default     = "fase3-games-api"
+  default     = "fase4-games-api"
 }
 
 variable "environment" {

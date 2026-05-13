@@ -26,7 +26,7 @@ Depois do `apply`, copie o valor de `games_api_role_arn` para a anotacao `eks.am
 Configure o `kubectl`:
 
 ```powershell
-aws eks update-kubeconfig --region us-east-1 --name fase3-games-api-dev
+aws eks update-kubeconfig --region us-east-1 --name fase4-games-api-dev
 ```
 
 Publique a imagem no Docker Hub e aplique os manifests:

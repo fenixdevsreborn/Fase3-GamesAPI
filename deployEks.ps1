@@ -1,7 +1,7 @@
 param(
   [string]$Namespace = "fase4",
   [string]$Region = "us-east-1",
-  [string]$ClusterName = "fase3-games-api-dev",
+  [string]$ClusterName = "fase4-games-api-dev",
   [string]$Image = "adinteltidev/games-api:latest",
   [string]$GamesApiRoleArn = ""
 )
@@ -12,6 +12,7 @@ aws eks update-kubeconfig --name $ClusterName --region $Region
 
 kubectl apply -f k8s/eks/00-namespace.yaml
 kubectl apply -f k8s/eks/01-secrets.yaml
+kubectl apply -f k8s/eks/01-rabbitmq-secrets.yaml
 kubectl apply -f k8s/eks/02-serviceaccount.yaml
 
 if ($GamesApiRoleArn -ne "") {

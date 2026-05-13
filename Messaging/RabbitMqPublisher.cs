@@ -19,7 +19,8 @@ public sealed class RabbitMqPublisher : IMessagePublisher, IAsyncDisposable, IDi
             HostName = _configuration["RabbitMq:Host"] ?? "localhost",
             Port = int.Parse(_configuration["RabbitMq:Port"] ?? "5672"),
             UserName = _configuration["RabbitMq:Username"] ?? "guest",
-            Password = _configuration["RabbitMq:Password"] ?? "guest"
+            Password = _configuration["RabbitMq:Password"] ?? "guest",
+            VirtualHost = _configuration["RabbitMq:VirtualHost"] ?? "/"
         };
 
         _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
@@ -41,6 +42,22 @@ public sealed class RabbitMqPublisher : IMessagePublisher, IAsyncDisposable, IDi
             autoDelete: false,
             arguments: null);
 
+        var exchangeName = _configuration["RabbitMq:ExchangeName"];
+        if (!string.IsNullOrWhiteSpace(exchangeName))
+        {
+            await _channel.ExchangeDeclareAsync(
+                exchange: exchangeName,
+                type: ExchangeType.Topic,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
+
+            await _channel.QueueBindAsync(
+                queue: queueName,
+                exchange: exchangeName,
+                routingKey: queueName);
+        }
+
         var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
         var properties = new BasicProperties
         {
@@ -50,7 +67,7 @@ public sealed class RabbitMqPublisher : IMessagePublisher, IAsyncDisposable, IDi
         };
 
         await _channel.BasicPublishAsync(
-            exchange: string.Empty,
+            exchange: exchangeName ?? string.Empty,
             routingKey: queueName,
             mandatory: false,
             basicProperties: properties,

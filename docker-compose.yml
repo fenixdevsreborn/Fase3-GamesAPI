@@ -1,13 +1,16 @@
+name: fase4-gamesapi
+
 services:
   rabbitmq:
     image: rabbitmq:3.12-management-alpine
-    container_name: ms-games-rabbitmq
+    container_name: fiap-rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_VHOST: fiap
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -73,6 +76,8 @@ services:
       RabbitMq__Port: "5672"
       RabbitMq__Username: admin
       RabbitMq__Password: admin123
+      RabbitMq__VirtualHost: fiap
+      RabbitMq__ExchangeName: fiap.events
       RabbitMq__PaymentQueueName: payment-queue
     depends_on:
       rabbitmq:
@@ -84,7 +89,9 @@ services:
 
 volumes:
   rabbitmq_data:
+    name: fiap-rabbitmq-data
 
 networks:
   ms-network:
+    name: fiap-ms-network
     driver: bridge

@@ -26,6 +26,8 @@ Variaveis esperadas pela aplicacao:
 - `RabbitMq__Port`
 - `RabbitMq__Username`
 - `RabbitMq__Password`
+- `RabbitMq__VirtualHost`
+- `RabbitMq__ExchangeName`
 - `RabbitMq__PaymentQueueName`
 
 Os valores de JWT devem ser compativeis com a `ms-usersapi`, especialmente `Jwt__Secret`, `Jwt__Issuer` e `Jwt__Audience`.
@@ -42,7 +44,14 @@ Servicos locais:
 - RabbitMQ Management: `http://localhost:15672`
 - DynamoDB Local: `http://localhost:8000`
 
-O Compose cria a tabela DynamoDB `Games` automaticamente no DynamoDB Local.
+O Compose cria a tabela DynamoDB `Games` automaticamente no DynamoDB Local. Para rodar a Games API junto com a Users API usando um unico RabbitMQ, execute o Compose da raiz do workspace:
+
+```powershell
+cd ..
+docker compose up --build
+```
+
+Esse arquivo sobe um unico `fiap-rabbitmq`, com vhost `fiap`, exchange `fiap.events`, Users API em `http://localhost:5000` e Games API em `http://localhost:5001`.
 
 ## Execucao local com Kubernetes
 
@@ -79,7 +88,7 @@ Depois do `apply`, use o output `games_api_role_arn` na ServiceAccount Kubernete
 
 ```powershell
 .\deployEks.ps1 `
-  -ClusterName fase3-games-api-dev `
+  -ClusterName fase4-games-api-dev `
   -Region us-east-1 `
   -Image adinteltidev/games-api:latest `
   -GamesApiRoleArn <role-arn-gerado-pelo-terraform>
