@@ -4,15 +4,15 @@
   {
     public string EventType => "PURCHASE_REQUESTED";
 
-    public string UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
-    public string GameId { get; set; }
+    public string GameId { get; set; } = string.Empty;
 
     public decimal GameValue{ get; set; }
 
-    public string GameName{ get; set; }
+    public string GameName{ get; set; } = string.Empty;
 
     public decimal Amount { get; set; }
 

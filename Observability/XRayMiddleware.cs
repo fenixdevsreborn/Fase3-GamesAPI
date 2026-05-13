@@ -13,7 +13,7 @@ namespace ms_games.Observability
 
     public async Task Invoke(HttpContext context)
     {
-      AWSXRayRecorder.Instance.BeginSubsegment("UsersAPI");
+      AWSXRayRecorder.Instance.BeginSegment("GamesAPI");
 
       try
       {
@@ -26,7 +26,7 @@ namespace ms_games.Observability
       }
       finally
       {
-        AWSXRayRecorder.Instance.EndSubsegment();
+        AWSXRayRecorder.Instance.EndSegment();
       }
     }
   }

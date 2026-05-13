@@ -1,0 +1,45 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name "${{ secrets.EKS_CLUSTER_NAME }}" --region "${{ secrets.AWS_REGION }}"
+
+      - name: Apply manifests
+        run: |
+          kubectl apply -f k8s/eks/00-namespace.yaml
+          kubectl apply -f k8s/eks/01-secrets.yaml
+          kubectl apply -f k8s/eks/02-serviceaccount.yaml
+          kubectl annotate serviceaccount games-api eks.amazonaws.com/role-arn="${{ secrets.GAMES_API_ROLE_ARN }}" -n fase4 --overwrite
+          kubectl apply -f k8s/eks/03-rabbitmq.yaml
+          kubectl apply -f k8s/eks/04-games-api.yaml
+          kubectl apply -f k8s/eks/05-service.yaml
+          kubectl apply -f k8s/eks/06-hpa.yaml
+          kubectl apply -f k8s/eks/07-ingress.yaml
+
+      - name: Deploy image
+        run: |
+          kubectl set image deployment/games-api games-api=${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ github.sha }} -n fase4
+          kubectl rollout status deployment/games-api -n fase4

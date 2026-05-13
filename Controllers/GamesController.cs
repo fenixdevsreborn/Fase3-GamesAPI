@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ms_games.Models;
 using ms_games.Services;
@@ -47,6 +47,7 @@ public class GamesController : ControllerBase
     return Ok();
   }
 
+  [Authorize]
   [HttpPost("{gameId}/buy")]
   public async Task<IActionResult> BuyGame(string gameId, [FromBody] BuyRequest request)
   {
@@ -75,6 +76,7 @@ public class GamesController : ControllerBase
     });
   }
 
+  [Authorize]
   [HttpGet("{gameId}/recommendations")]
   public async Task<IActionResult> GetRecommendations(string gameId, [FromQuery] int count = 3)
   {
@@ -84,7 +86,7 @@ public class GamesController : ControllerBase
     if (userId == null || email == null)
       return Unauthorized();
 
-    var recommendations = await _service.GetRecommendation(gameId);
+    var recommendations = await _service.GetRecommendation(gameId, count);
 
     return Ok(recommendations);
   }

@@ -1,10 +1,14 @@
-﻿using Amazon.DynamoDBv2;
-using Amazon.SQS;
+using Amazon.DynamoDBv2;
 using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using ms_games.Messaging;
 using ms_games.Observability;
-using ms_games.Publisher;
 using ms_games.Repositories;
 using ms_games.Services;
+using System.Text;
+using System.Text.Json.Serialization;
 
 namespace ms_games;
 
@@ -17,45 +21,132 @@ public class Startup
 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddControllers();
+      services.AddLogging(config =>
+      {
+        config.AddConsole();
+        config.SetMinimumLevel(LogLevel.Information);
+      });
+
+      services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+          options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+          options.JsonSerializerOptions.WriteIndented = true;
+        });
+
+      services.AddSwaggerGen(options =>
+      {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+          Title = "Games API",
+          Version = "v1",
+          Description = "Microservico de catalogo e compra de games"
+        });
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+          In = ParameterLocation.Header,
+          Description = "Enter the Bearer token",
+          Name = "Authorization",
+          Type = SecuritySchemeType.Http,
+          BearerFormat = "JWT",
+          Scheme = "Bearer"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+          {
+            new OpenApiSecurityScheme
+            {
+              Reference = new OpenApiReference
+              {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+              }
+            },
+            Array.Empty<string>()
+          }
+        });
+      });
+
+      ConfigureJwt(services);
 
       services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-      services.AddAWSService<IAmazonSQS>();
       services.AddAWSService<IAmazonDynamoDB>();
 
-      services.AddScoped<EventPublisher>();
+      services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
       services.AddScoped<GameService>();
       services.AddScoped<GameRepository>();
+      services.AddHealthChecks();
 
       AWSSDKHandler.RegisterXRayForAllServices();
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+              options.SwaggerEndpoint("/swagger/v1/swagger.json", "Games API v1");
+              options.RoutePrefix = string.Empty;
+            });
         }
-
-        app.UseHttpsRedirection();
 
         app.UseRouting();
 
-        app.UseMiddleware<XRayMiddleware>();
-
+        app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseMiddleware<XRayMiddleware>();
 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            endpoints.MapHealthChecks("/health");
             endpoints.MapGet("/", async context =>
             {
-                await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+                await context.Response.WriteAsync("Games API running on Kubernetes");
             });
         });
+    }
+
+    private void ConfigureJwt(IServiceCollection services)
+    {
+      var jwtSecret = Configuration["Jwt:Secret"];
+      var jwtIssuer = Configuration["Jwt:Issuer"];
+      var jwtAudience = Configuration["Jwt:Audience"];
+
+      if (string.IsNullOrEmpty(jwtSecret))
+      {
+        throw new InvalidOperationException("JWT Secret is not configured");
+      }
+
+      var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+
+      services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+          options.RequireHttpsMetadata = false;
+          options.TokenValidationParameters = new TokenValidationParameters
+          {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key,
+            ValidateIssuer = !string.IsNullOrEmpty(jwtIssuer),
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = !string.IsNullOrEmpty(jwtAudience),
+            ValidAudience = jwtAudience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(5),
+            NameClaimType = "sub",
+            RoleClaimType = "role"
+          };
+        });
+
+      services.AddAuthorization();
     }
 }

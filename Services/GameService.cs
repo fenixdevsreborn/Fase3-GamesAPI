@@ -1,38 +1,42 @@
-﻿using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using ms_games.Events;
+using ms_games.Messaging;
 using ms_games.Models;
-using ms_games.Publisher;
 
 namespace ms_games.Services
 {
   public class GameService
   {
     private readonly DynamoDBContext _context;
-    private readonly EventPublisher _publisher;
+    private readonly IMessagePublisher _publisher;
     private readonly string _table;
+    private readonly string _paymentQueueName;
 
-    public GameService(IAmazonDynamoDB dynamo, EventPublisher publisher)
+    public GameService(IAmazonDynamoDB dynamo, IMessagePublisher publisher, IConfiguration configuration)
     {
-      _context = new DynamoDBContext(dynamo);
+      _context = new DynamoDBContextBuilder()
+        .WithDynamoDBClient(() => dynamo)
+        .Build();
       _publisher = publisher;
-      _table = Environment.GetEnvironmentVariable("GAMES_TABLE");
+      _table = configuration["DynamoDb:GamesTable"] ?? Environment.GetEnvironmentVariable("GAMES_TABLE") ?? "Games";
+      _paymentQueueName = configuration["RabbitMq:PaymentQueueName"] ?? "payment-queue";
     }
 
     public async Task<List<Game>> GetAll()
     {
-      return await _context.ScanAsync<Game>(new List<ScanCondition>()).GetRemainingAsync();
+      return await _context.ScanAsync<Game>(new List<ScanCondition>(), ScanConfig()).GetRemainingAsync();
     }
 
     public async Task<Game> GetById(string id)
     {
-      return await _context.LoadAsync<Game>(id);
+      return await _context.LoadAsync<Game>(id, LoadConfig());
     }
 
     public async Task<List<Game>> GetRecommendation(string gameId, int limit = 5)
     {
-      var baseGame = await _context.LoadAsync<Game>(gameId);
+      var baseGame = await _context.LoadAsync<Game>(gameId, LoadConfig());
 
       if (baseGame == null)
         throw new Exception("Game not found");
@@ -43,7 +47,7 @@ namespace ms_games.Services
       };
 
       var games = await _context
-        .ScanAsync<Game>(conditions)
+        .ScanAsync<Game>(conditions, ScanConfig())
         .GetRemainingAsync();
 
       var recommendations = games
@@ -59,18 +63,18 @@ namespace ms_games.Services
     public async Task Create(Game game)
     {
       game.Id = Guid.NewGuid().ToString();
-      await _context.SaveAsync(game);
+      await _context.SaveAsync(game, SaveConfig());
     }
 
     public async Task Update(string id, Game game)
     {
       game.Id = id;
-      await _context.SaveAsync(game);
+      await _context.SaveAsync(game, SaveConfig());
     }
 
     public async Task Delete(string id)
     {
-      await _context.DeleteAsync<Game>(id);
+      await _context.DeleteAsync<Game>(id, DeleteConfig());
     }
 
     public async Task RequestPurchase(string userId, string email, string gameId, string gameName, decimal gameValue, decimal amount)
@@ -86,9 +90,27 @@ namespace ms_games.Services
         RequestedAt = DateTime.UtcNow
       };
 
-      var queueUrl = Environment.GetEnvironmentVariable("PAYMENT_QUEUE_URL");
-
-      await _publisher.PublishAsync(queueUrl, evt);
+      await _publisher.PublishAsync(_paymentQueueName, evt);
     }
+
+    private LoadConfig LoadConfig() => new()
+    {
+      OverrideTableName = _table
+    };
+
+    private SaveConfig SaveConfig() => new()
+    {
+      OverrideTableName = _table
+    };
+
+    private DeleteConfig DeleteConfig() => new()
+    {
+      OverrideTableName = _table
+    };
+
+    private ScanConfig ScanConfig() => new()
+    {
+      OverrideTableName = _table
+    };
   }
 }

@@ -1,156 +1,104 @@
-# 🎮 Games API - Fase 3 (MVP AWS)
+# Games API - Fase 3
 
-## 📌 Visão Geral
+API .NET 8 para catalogo de jogos e solicitacao de compras. A aplicacao foi migrada de AWS Lambda para uma Web API containerizada, pronta para execucao em Docker, Kubernetes local e Amazon EKS.
 
-A **Games API** é um serviço backend desenvolvido como parte da Fase 3 do projeto, com foco em **arquitetura escalável, serverless e orientada a serviços**, utilizando recursos da AWS.
+## Arquitetura
 
-Este projeto tem como objetivo fornecer uma API robusta para gerenciamento de dados relacionados a jogos, permitindo operações seguras, performáticas e desacopladas, seguindo boas práticas de engenharia de software.
+- .NET 8 Web API executando via Kestrel na porta `8080`.
+- Imagem Docker publicada no Docker Hub por GitHub Actions.
+- Deploy em Kubernetes local ou Amazon EKS.
+- Amazon DynamoDB mantido como banco NoSQL da API.
+- RabbitMQ substitui o antigo fluxo baseado em Amazon SQS.
+- Autenticacao JWT Bearer usando o token emitido pela `ms-usersapi`.
+- Terraform cria VPC, EKS, AWS Load Balancer Controller, Metrics Server, DynamoDB e IAM Role IRSA.
 
----
+## Configuracoes principais
 
-## 🎯 Objetivos do Projeto
+Variaveis esperadas pela aplicacao:
 
-* Disponibilizar endpoints para gerenciamento de jogos
-* Implementar arquitetura **serverless com AWS**
-* Garantir **alta disponibilidade e escalabilidade automática**
-* Aplicar princípios de:
+- `AWS__Region`
+- `AWS__ServiceURL`, apenas para DynamoDB Local
+- `DynamoDb__GamesTable`
+- `Jwt__Secret`
+- `Jwt__Issuer`
+- `Jwt__Audience`
+- `RabbitMq__Host`
+- `RabbitMq__Port`
+- `RabbitMq__Username`
+- `RabbitMq__Password`
+- `RabbitMq__PaymentQueueName`
 
-  * Clean Architecture
-  * SOLID
-  * Domain-driven design (DDD - quando aplicável)
+Os valores de JWT devem ser compativeis com a `ms-usersapi`, especialmente `Jwt__Secret`, `Jwt__Issuer` e `Jwt__Audience`.
 
----
+## Execucao local com Docker Compose
 
-## 🏗️ Arquitetura
-
-O projeto segue uma abordagem baseada em **arquitetura hexagonal (Ports & Adapters)**, promovendo desacoplamento entre domínio e infraestrutura.
-
-### 🔹 Camadas
-
-* **Domain**
-
-  * Entidades
-  * Regras de negócio
-  * Interfaces (ports)
-
-* **Application**
-
-  * Casos de uso (use cases)
-  * Orquestração das regras de negócio
-
-* **Infrastructure**
-
-  * Integrações externas (AWS, banco, etc)
-  * Implementações de repositórios
-
-* **API / EntryPoint**
-
-  * Lambdas / Controllers
-  * Mapeamento HTTP
-
----
-
-## ☁️ Infraestrutura (AWS)
-
-O projeto utiliza uma stack moderna baseada em serviços gerenciados:
-
-* **AWS Lambda**
-
-  * Execução serverless dos endpoints
-
-* **Amazon API Gateway**
-
-  * Exposição dos endpoints HTTP
-
-* **Amazon DynamoDB**
-
-  * Banco de dados NoSQL (alta performance e escalabilidade)
-
-* **AWS IAM**
-
-  * Controle de permissões e segurança
-
-* **AWS CloudWatch**
-
-  * Logs e monitoramento
-
----
-
-## 🔗 Principais Funcionalidades
-
-* 📥 Cadastro de jogos
-* 📄 Consulta de jogos
-* ✏️ Atualização de dados
-* ❌ Remoção de registros
-* 🔍 Filtros e buscas
-
----
-
-## 🔐 Segurança
-
-* Validação de entrada (input validation)
-* Controle de acesso via políticas IAM
-* Possível integração com JWT (caso implementado)
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-* **.NET 8**
-* **C#**
-* **AWS Lambda**
-* **API Gateway**
-* **DynamoDB**
-* **Terraform / IaC (se aplicável)**
-
----
-
-## ⚙️ Como Executar o Projeto
-
-### 🔧 Pré-requisitos
-
-* .NET 8 SDK
-* AWS CLI configurado
-* Conta AWS ativa
-* Ferramentas:
-
-  * `dotnet lambda`
-  * Terraform (opcional)
-
----
-
-### ▶️ Execução local
-
-```bash
-dotnet restore
-dotnet build
-dotnet run
+```powershell
+docker compose up --build
 ```
 
----
+Servicos locais:
 
-### ☁️ Deploy na AWS
+- Games API: `http://localhost:5001`
+- RabbitMQ Management: `http://localhost:15672`
+- DynamoDB Local: `http://localhost:8000`
 
-```bash
-dotnet lambda deploy-serverless
+O Compose cria a tabela DynamoDB `Games` automaticamente no DynamoDB Local.
+
+## Execucao local com Kubernetes
+
+```powershell
+.\deployLocal.ps1
 ```
 
-Ou via Terraform:
+Ou manualmente:
 
-```bash
+```powershell
+kubectl apply -f k8s/local
+kubectl rollout status deployment/games-api -n fase4
+```
+
+## Infraestrutura AWS
+
+```powershell
+.\criarClusterEks.ps1
+```
+
+Ou manualmente:
+
+```powershell
+cd iac/terraform/aws
+Copy-Item terraform.tfvars.example terraform.tfvars
 terraform init
+terraform plan
 terraform apply
 ```
 
----
+Depois do `apply`, use o output `games_api_role_arn` na ServiceAccount Kubernetes da Games API.
 
-## 📦 Estrutura do Projeto
+## Deploy no EKS
 
+```powershell
+.\deployEks.ps1 `
+  -ClusterName fase3-games-api-dev `
+  -Region us-east-1 `
+  -Image adinteltidev/games-api:latest `
+  -GamesApiRoleArn <role-arn-gerado-pelo-terraform>
 ```
-src/
- ├── Domain/
- ├── Application/
- ├── Infrastructure/
- ├── API/
- └── Shared/
-```
+
+## CI/CD
+
+Workflows:
+
+- `.github/workflows/docker-build-push.yml`: build e push da imagem para Docker Hub.
+- `.github/workflows/deploy-eks.yml`: aplica manifests e atualiza a imagem no EKS.
+
+Secrets esperados:
+
+- `DOCKER_HUB_USERNAME`
+- `DOCKER_HUB_TOKEN`
+- `DOCKER_HUB_REPOSITORY`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `EKS_CLUSTER_NAME`
+- `GAMES_API_ROLE_ARN`

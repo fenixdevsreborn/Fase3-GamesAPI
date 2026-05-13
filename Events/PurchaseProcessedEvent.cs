@@ -4,9 +4,9 @@
   {
     public string EventType => "PURCHASE_PROCESSED";
 
-    public string UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
-    public string GameId { get; set; }
+    public string GameId { get; set; } = string.Empty;
 
     public decimal Amount { get; set; }
 
