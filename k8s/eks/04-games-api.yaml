@@ -6,7 +6,7 @@ metadata:
   labels:
     app: games-api
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -23,14 +23,14 @@ spec:
       serviceAccountName: games-api
       containers:
       - name: games-api
-        image: adinteltidev/games-api:latest
+        image: adinteltidev/fase4-games-api
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: Production
+          value: Development
         - name: ASPNETCORE_URLS
           value: http://+:8080
         - name: AWS__Region

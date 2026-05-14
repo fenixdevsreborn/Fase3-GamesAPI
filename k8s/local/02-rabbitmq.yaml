@@ -4,6 +4,7 @@ metadata:
   name: rabbitmq
   namespace: fase4
   labels:
+    app: rabbitmq
     app.kubernetes.io/name: rabbitmq
     app.kubernetes.io/part-of: fase4-shared-messaging
 spec:
@@ -25,6 +26,7 @@ metadata:
   name: rabbitmq
   namespace: fase4
   labels:
+    app: rabbitmq
     app.kubernetes.io/name: rabbitmq
     app.kubernetes.io/part-of: fase4-shared-messaging
 spec:
@@ -74,8 +76,16 @@ spec:
             port: 5672
           initialDelaySeconds: 60
           periodSeconds: 10
+          failureThreshold: 5
         readinessProbe:
           tcpSocket:
             port: 5672
           initialDelaySeconds: 30
           periodSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/rabbitmq
+      volumes:
+      - name: data
+        emptyDir: {}

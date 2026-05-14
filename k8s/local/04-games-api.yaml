@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: games-api
-        image: adinteltidev/games-api:latest
+        image: adinteltidev/fase4-games-api:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

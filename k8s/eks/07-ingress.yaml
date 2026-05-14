@@ -26,3 +26,31 @@ spec:
             name: games-api
             port:
               number: 80
+      - path: /swagger
+        pathType: Prefix
+        backend:
+          service:
+            name: games-api
+            port:
+              number: 80
+      - path: /swagger-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: games-api
+            port:
+              number: 80
+      - path: /index.html
+        pathType: Exact
+        backend:
+          service:
+            name: games-api
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: games-api
+            port:
+              number: 80
