@@ -27,6 +27,16 @@ public class GamesController : ControllerBase
   {
     return Ok(await _service.GetById(id));
   }
+  
+  [HttpGet("/search")]
+  public async Task<IActionResult> Search(
+      [FromQuery] string q,
+      [FromQuery] int page = 1,
+      [FromQuery] int pageSize = 10)
+  {
+      var result = await _service.Search(q, page, pageSize);
+      return Ok(result);
+  }
 
   [HttpPost]
   public async Task<IActionResult> Create([FromBody] Game game)

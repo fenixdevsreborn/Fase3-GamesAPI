@@ -79,6 +79,7 @@ public class Startup
       services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
       services.AddScoped<GameService>();
       services.AddScoped<GameRepository>();
+      services.AddScoped<ElasticGameSearchRepository>();
       services.AddHealthChecks();
 
       AWSSDKHandler.RegisterXRayForAllServices();

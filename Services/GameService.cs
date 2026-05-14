@@ -4,6 +4,7 @@ using Amazon.DynamoDBv2.DocumentModel;
 using ms_games.Events;
 using ms_games.Messaging;
 using ms_games.Models;
+using ms_games.Repositories;
 
 namespace ms_games.Services
 {
@@ -13,8 +14,13 @@ namespace ms_games.Services
     private readonly IMessagePublisher _publisher;
     private readonly string _table;
     private readonly string _paymentQueueName;
+    private readonly ElasticGameSearchRepository _searchRepository;
 
-    public GameService(IAmazonDynamoDB dynamo, IMessagePublisher publisher, IConfiguration configuration)
+    public GameService(
+      IAmazonDynamoDB dynamo,
+      IMessagePublisher publisher,
+      IConfiguration configuration,
+      ElasticGameSearchRepository searchRepository)
     {
       _context = new DynamoDBContextBuilder()
         .WithDynamoDBClient(() => dynamo)
@@ -22,6 +28,7 @@ namespace ms_games.Services
       _publisher = publisher;
       _table = configuration["DynamoDb:GamesTable"] ?? Environment.GetEnvironmentVariable("GAMES_TABLE") ?? "Games";
       _paymentQueueName = configuration["RabbitMq:PaymentQueueName"] ?? "payment-queue";
+      _searchRepository = searchRepository;
     }
 
     public async Task<List<Game>> GetAll()
@@ -32,6 +39,20 @@ namespace ms_games.Services
     public async Task<Game> GetById(string id)
     {
       return await _context.LoadAsync<Game>(id, LoadConfig());
+    }
+
+    public async Task<List<Game>> Search(string term, int page = 1, int pageSize = 10)
+    {
+      if (string.IsNullOrWhiteSpace(term))
+        return new List<Game>();
+
+      if (page < 1)
+        page = 1;
+
+      if (pageSize < 1)
+        pageSize = 10;
+
+      return await _searchRepository.SearchAsync(term, page, pageSize);
     }
 
     public async Task<List<Game>> GetRecommendation(string gameId, int limit = 5)
@@ -64,17 +85,20 @@ namespace ms_games.Services
     {
       game.Id = Guid.NewGuid().ToString();
       await _context.SaveAsync(game, SaveConfig());
+      await _searchRepository.IndexAsync(game);
     }
 
     public async Task Update(string id, Game game)
     {
       game.Id = id;
       await _context.SaveAsync(game, SaveConfig());
+      await _searchRepository.IndexAsync(game);
     }
 
     public async Task Delete(string id)
     {
       await _context.DeleteAsync<Game>(id, DeleteConfig());
+      await _searchRepository.DeleteAsync(id);
     }
 
     public async Task RequestPurchase(string userId, string email, string gameId, string gameName, decimal gameValue, decimal amount)
