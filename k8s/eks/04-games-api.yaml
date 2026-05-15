@@ -80,6 +80,10 @@ spec:
           value: fiap.events
         - name: RabbitMq__PaymentQueueName
           value: payment-queue
+        - name: Elasticsearch__Url
+          value: http://elasticsearch:9200
+        - name: Elasticsearch__IndexName
+          value: games
         resources:
           requests:
             memory: "256Mi"

@@ -80,11 +80,15 @@ services:
       RabbitMq__VirtualHost: fiap
       RabbitMq__ExchangeName: fiap.events
       RabbitMq__PaymentQueueName: payment-queue
+      Elasticsearch__Url: http://elasticsearch:9200
+      Elasticsearch__IndexName: games
     depends_on:
       rabbitmq:
         condition: service_healthy
       dynamodb-init:
         condition: service_completed_successfully
+      elasticsearch:
+        condition: service_healthy
     networks:
       - ms-network
 
@@ -94,8 +98,16 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - node.store.allow_mmap=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health?wait_for_status=yellow\\&timeout=5s || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
     networks:
       - ms-network
 
