@@ -22,6 +22,12 @@ public class GamesController : ControllerBase
     return Ok(await _service.GetAll());
   }
 
+  [HttpGet("cache")]
+  public async Task<IActionResult> GetCached()
+  {
+    return Ok(await _service.GetAllCached());
+  }
+
   [HttpGet("{id}")]
   public async Task<IActionResult> GetById(string id)
   {

@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using ms_games.Events;
@@ -6,6 +7,7 @@ using ms_games.Messaging;
 using ms_games.Models;
 using ms_games.Repositories;
 using ms_games.Services;
+using System.Text.Json;
 
 namespace ms_games.Tests;
 
@@ -99,9 +101,30 @@ public class GameServiceTests
         searchRepository.Verify(r => r.SearchAsync("halo", 2, 25), Times.Once);
     }
 
+    [Fact]
+    public async Task GetAllCached_WhenCacheHasGames_ReturnsGamesFromDistributedCache()
+    {
+        var cachedGames = new List<Game>
+        {
+            new() { Id = "game-123", Name = "Halo", Category = "FPS", Price = 99.90m }
+        };
+
+        var cache = new InMemoryDistributedCache();
+        await cache.SetStringAsync("games:list", JsonSerializer.Serialize(cachedGames));
+
+        var service = CreateService(cache: cache);
+
+        var result = await service.GetAllCached();
+
+        Assert.Single(result);
+        Assert.Equal("game-123", result[0].Id);
+        Assert.Equal("Halo", result[0].Name);
+    }
+
     private static GameService CreateService(
         Mock<IMessagePublisher>? publisher = null,
-        Mock<IGameSearchRepository>? searchRepository = null)
+        Mock<IGameSearchRepository>? searchRepository = null,
+        IDistributedCache? cache = null)
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -115,6 +138,50 @@ public class GameServiceTests
             Mock.Of<IAmazonDynamoDB>(),
             publisher?.Object ?? Mock.Of<IMessagePublisher>(),
             configuration,
+            cache ?? Mock.Of<IDistributedCache>(),
             searchRepository?.Object ?? Mock.Of<IGameSearchRepository>());
+    }
+
+    private sealed class InMemoryDistributedCache : IDistributedCache
+    {
+        private readonly Dictionary<string, byte[]> _items = new();
+
+        public byte[]? Get(string key) => _items.GetValueOrDefault(key);
+
+        public Task<byte[]?> GetAsync(string key, CancellationToken token = default)
+        {
+            return Task.FromResult(Get(key));
+        }
+
+        public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
+        {
+            _items[key] = value;
+        }
+
+        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default)
+        {
+            Set(key, value, options);
+            return Task.CompletedTask;
+        }
+
+        public void Refresh(string key)
+        {
+        }
+
+        public Task RefreshAsync(string key, CancellationToken token = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public void Remove(string key)
+        {
+            _items.Remove(key);
+        }
+
+        public Task RemoveAsync(string key, CancellationToken token = default)
+        {
+            Remove(key);
+            return Task.CompletedTask;
+        }
     }
 }

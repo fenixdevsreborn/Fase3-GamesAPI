@@ -88,6 +88,14 @@ spec:
           value: http://elasticsearch:9200
         - name: Elasticsearch__IndexName
           value: games
+        - name: Redis__ConnectionString
+          value: redis:6379
+        - name: Redis__InstanceName
+          value: "games-api:"
+        - name: Cache__GamesListKey
+          value: games:list
+        - name: Cache__GamesListTtlSeconds
+          value: "300"
         resources:
           requests:
             memory: "128Mi"

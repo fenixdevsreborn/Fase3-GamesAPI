@@ -1,16 +1,19 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Microsoft.Extensions.Caching.Distributed;
 using ms_games.Events;
 using ms_games.Messaging;
 using ms_games.Models;
 using ms_games.Repositories;
+using System.Text.Json;
 
 namespace ms_games.Services
 {
   public interface IGameService
   {
     Task<List<Game>> GetAll();
+    Task<List<Game>> GetAllCached();
     Task<Game> GetById(string id);
     Task<List<Game>> Search(string term, int page = 1, int pageSize = 10);
     Task<List<Game>> GetRecommendation(string gameId, int limit = 5);
@@ -26,26 +29,57 @@ namespace ms_games.Services
     private readonly IMessagePublisher _publisher;
     private readonly string _table;
     private readonly string _paymentQueueName;
+    private readonly IDistributedCache _cache;
     private readonly IGameSearchRepository _searchRepository;
+    private readonly string _gamesCacheKey;
+    private readonly int _gamesCacheTtlSeconds;
 
     public GameService(
       IAmazonDynamoDB dynamo,
       IMessagePublisher publisher,
       IConfiguration configuration,
+      IDistributedCache cache,
       IGameSearchRepository searchRepository)
     {
       _context = new DynamoDBContextBuilder()
         .WithDynamoDBClient(() => dynamo)
         .Build();
       _publisher = publisher;
+      _cache = cache;
       _table = configuration["DynamoDb:GamesTable"] ?? Environment.GetEnvironmentVariable("GAMES_TABLE") ?? "Games";
       _paymentQueueName = configuration["RabbitMq:PaymentQueueName"] ?? "payment-queue";
+      _gamesCacheKey = configuration["Cache:GamesListKey"] ?? "games:list";
+      _gamesCacheTtlSeconds = int.TryParse(configuration["Cache:GamesListTtlSeconds"], out var ttlSeconds)
+        ? ttlSeconds
+        : 300;
       _searchRepository = searchRepository;
     }
 
     public async Task<List<Game>> GetAll()
     {
       return await _context.ScanAsync<Game>(new List<ScanCondition>(), ScanConfig()).GetRemainingAsync();
+    }
+
+    public async Task<List<Game>> GetAllCached()
+    {
+      var cachedGames = await _cache.GetStringAsync(_gamesCacheKey);
+
+      if (!string.IsNullOrWhiteSpace(cachedGames))
+      {
+        return JsonSerializer.Deserialize<List<Game>>(cachedGames) ?? new List<Game>();
+      }
+
+      var games = await GetAll();
+
+      await _cache.SetStringAsync(
+        _gamesCacheKey,
+        JsonSerializer.Serialize(games),
+        new DistributedCacheEntryOptions
+        {
+          AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(_gamesCacheTtlSeconds)
+        });
+
+      return games;
     }
 
     public async Task<Game> GetById(string id)
@@ -98,6 +132,7 @@ namespace ms_games.Services
       game.Id = Guid.NewGuid().ToString();
       await _context.SaveAsync(game, SaveConfig());
       await _searchRepository.IndexAsync(game);
+      await _cache.RemoveAsync(_gamesCacheKey);
     }
 
     public async Task Update(string id, Game game)
@@ -105,12 +140,14 @@ namespace ms_games.Services
       game.Id = id;
       await _context.SaveAsync(game, SaveConfig());
       await _searchRepository.IndexAsync(game);
+      await _cache.RemoveAsync(_gamesCacheKey);
     }
 
     public async Task Delete(string id)
     {
       await _context.DeleteAsync<Game>(id, DeleteConfig());
       await _searchRepository.DeleteAsync(id);
+      await _cache.RemoveAsync(_gamesCacheKey);
     }
 
     public async Task RequestPurchase(string userId, string email, string gameId, string gameName, decimal gameValue, decimal amount)

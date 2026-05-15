@@ -72,6 +72,7 @@ public class Startup
       });
 
       ConfigureJwt(services);
+      ConfigureDistributedCache(services);
 
       services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
       services.AddAWSService<IAmazonDynamoDB>();
@@ -169,5 +170,17 @@ public class Startup
         });
 
       services.AddAuthorization();
+    }
+
+    private void ConfigureDistributedCache(IServiceCollection services)
+    {
+      var redisConnectionString = Configuration["Redis:ConnectionString"] ?? "localhost:6379";
+      var instanceName = Configuration["Redis:InstanceName"] ?? "games-api:";
+
+      services.AddStackExchangeRedisCache(options =>
+      {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = instanceName;
+      });
     }
 }

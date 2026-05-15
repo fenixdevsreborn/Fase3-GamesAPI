@@ -40,6 +40,26 @@ public class GamesControllerTests
     }
 
     [Fact]
+    public async Task GetCached_ReturnsCachedGamesFromService()
+    {
+        var games = new List<Game>
+        {
+            new() { Id = "game-123", Name = "Halo", Category = "FPS", Price = 99.90m }
+        };
+
+        var service = new Mock<IGameService>();
+        service.Setup(s => s.GetAllCached()).ReturnsAsync(games);
+
+        var controller = CreateController(service, userId: null, email: null);
+
+        var result = await controller.GetCached();
+
+        var ok = Assert.IsType<OkObjectResult>(result);
+        Assert.Same(games, ok.Value);
+        service.Verify(s => s.GetAllCached(), Times.Once);
+    }
+
+    [Fact]
     public async Task BuyGame_WhenUserIdClaimIsMissing_ReturnsUnauthorized()
     {
         var service = new Mock<IGameService>();
