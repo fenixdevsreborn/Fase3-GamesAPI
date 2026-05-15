@@ -8,19 +8,31 @@ using ms_games.Repositories;
 
 namespace ms_games.Services
 {
-  public class GameService
+  public interface IGameService
+  {
+    Task<List<Game>> GetAll();
+    Task<Game> GetById(string id);
+    Task<List<Game>> Search(string term, int page = 1, int pageSize = 10);
+    Task<List<Game>> GetRecommendation(string gameId, int limit = 5);
+    Task Create(Game game);
+    Task Update(string id, Game game);
+    Task Delete(string id);
+    Task RequestPurchase(string userId, string email, string gameId, string gameName, decimal gameValue, decimal amount);
+  }
+
+  public class GameService : IGameService
   {
     private readonly DynamoDBContext _context;
     private readonly IMessagePublisher _publisher;
     private readonly string _table;
     private readonly string _paymentQueueName;
-    private readonly ElasticGameSearchRepository _searchRepository;
+    private readonly IGameSearchRepository _searchRepository;
 
     public GameService(
       IAmazonDynamoDB dynamo,
       IMessagePublisher publisher,
       IConfiguration configuration,
-      ElasticGameSearchRepository searchRepository)
+      IGameSearchRepository searchRepository)
     {
       _context = new DynamoDBContextBuilder()
         .WithDynamoDBClient(() => dynamo)

@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="ms-games.Tests\**\*.cs" />
+    <Content Remove="ms-games.Tests\**\*" />
+    <EmbeddedResource Remove="ms-games.Tests\**\*" />
+    <None Remove="ms-games.Tests\**\*" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.15" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.23" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.6.4" />

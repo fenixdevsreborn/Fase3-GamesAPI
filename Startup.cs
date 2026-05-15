@@ -77,9 +77,9 @@ public class Startup
       services.AddAWSService<IAmazonDynamoDB>();
 
       services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
-      services.AddScoped<GameService>();
+      services.AddScoped<IGameService, GameService>();
       services.AddScoped<GameRepository>();
-      services.AddScoped<ElasticGameSearchRepository>();
+      services.AddScoped<IGameSearchRepository, ElasticGameSearchRepository>();
       services.AddHealthChecks();
 
       AWSSDKHandler.RegisterXRayForAllServices();

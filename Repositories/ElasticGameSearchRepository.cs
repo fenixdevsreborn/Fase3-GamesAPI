@@ -5,7 +5,14 @@ using ms_games.Models;
 
 namespace ms_games.Repositories
 {
-    public class ElasticGameSearchRepository
+    public interface IGameSearchRepository
+    {
+        Task IndexAsync(Game game);
+        Task<List<Game>> SearchAsync(string term, int page, int pageSize);
+        Task DeleteAsync(string id);
+    }
+
+    public class ElasticGameSearchRepository : IGameSearchRepository
     {
         private readonly ElasticsearchClient _client;
         private readonly ILogger<ElasticGameSearchRepository> _logger;

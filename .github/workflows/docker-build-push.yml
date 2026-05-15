@@ -1,4 +1,4 @@
-name: Build and Push to Docker Hub
+name: Test, Build and Push to Docker Hub
 
 on:
   push:
@@ -11,7 +11,26 @@ on:
       - main
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ms-games.sln
+
+      - name: Run unit tests
+        run: dotnet test ms-games.sln --configuration Release --no-restore --verbosity normal
+
   build:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +54,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ secrets.DOCKER_HUB_REPOSITORY }}:latest
-            ${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ github.sha }}
-            ${{ secrets.DOCKER_HUB_REPOSITORY }}:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
