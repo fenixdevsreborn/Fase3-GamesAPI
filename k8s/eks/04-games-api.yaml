@@ -84,8 +84,10 @@ spec:
           value: http://elasticsearch:9200
         - name: Elasticsearch__IndexName
           value: games
-        - name: Redis__ConnectionString
-          value: redis:6379
+        - name: Redis__Host
+          value: redis
+        - name: Redis__Port
+          value: "6379"
         - name: Redis__InstanceName
           value: "games-api:"
         - name: Cache__GamesListKey

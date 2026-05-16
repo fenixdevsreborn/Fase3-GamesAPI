@@ -33,7 +33,12 @@ Publique a imagem no Docker Hub e aplique os manifests:
 
 ```powershell
 kubectl apply -f ../../../k8s/eks/00-namespace.yaml
-kubectl apply -f ../../../k8s/eks/01-secrets.yaml
+kubectl create secret generic games-api-secrets -n fase4 `
+  --from-literal=jwt-secret="$env:JWT_SECRET" `
+  --from-literal=jwt-issuer="$env:JWT_ISSUER" `
+  --from-literal=jwt-audience="$env:JWT_AUDIENCE" `
+  --from-literal=jwt-key-id="$env:JWT_KEY_ID" `
+  --dry-run=client -o yaml | kubectl apply -f -
 kubectl apply -f ../../../k8s/eks/02-serviceaccount.yaml
 kubectl apply -f ../../../k8s/eks/03-rabbitmq.yaml
 kubectl apply -f ../../../k8s/eks/04-games-api.yaml

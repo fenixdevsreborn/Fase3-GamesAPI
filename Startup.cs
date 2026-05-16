@@ -174,12 +174,14 @@ public class Startup
 
     private void ConfigureDistributedCache(IServiceCollection services)
     {
-      var redisConnectionString = Configuration["Redis:ConnectionString"] ?? "localhost:6379";
+      var redisHost = Configuration["Redis:Host"]
+        ?? throw new InvalidOperationException("Redis configuration 'Redis:Host' is not configured");
+      var redisPort = Configuration["Redis:Port"] ?? "6379";
       var instanceName = Configuration["Redis:InstanceName"] ?? "games-api:";
 
       services.AddStackExchangeRedisCache(options =>
       {
-        options.Configuration = redisConnectionString;
+        options.Configuration = $"{redisHost}:{redisPort}";
         options.InstanceName = instanceName;
       });
     }

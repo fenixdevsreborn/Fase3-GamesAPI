@@ -16,14 +16,20 @@ public sealed class RabbitMqPublisher : IMessagePublisher, IAsyncDisposable, IDi
 
         var factory = new ConnectionFactory
         {
-            HostName = _configuration["RabbitMq:Host"] ?? "localhost",
+            HostName = RequireConfiguration("RabbitMq:Host"),
             Port = int.Parse(_configuration["RabbitMq:Port"] ?? "5672"),
-            UserName = _configuration["RabbitMq:Username"] ?? "guest",
-            Password = _configuration["RabbitMq:Password"] ?? "guest",
-            VirtualHost = _configuration["RabbitMq:VirtualHost"] ?? "/"
+            UserName = RequireConfiguration("RabbitMq:Username"),
+            Password = RequireConfiguration("RabbitMq:Password"),
+            VirtualHost = RequireConfiguration("RabbitMq:VirtualHost")
         };
 
         _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+    }
+
+    private string RequireConfiguration(string key)
+    {
+        return _configuration[key]
+            ?? throw new InvalidOperationException($"RabbitMQ configuration '{key}' is not configured");
     }
 
     public async Task PublishAsync<T>(string queueName, T message) where T : class

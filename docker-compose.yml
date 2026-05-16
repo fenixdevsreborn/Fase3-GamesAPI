@@ -8,8 +8,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}"
       RABBITMQ_DEFAULT_VHOST: fiap
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
@@ -47,8 +47,8 @@ services:
     image: amazon/aws-cli:2.15.57
     container_name: ms-games-dynamodb-init
     environment:
-      AWS_ACCESS_KEY_ID: local
-      AWS_SECRET_ACCESS_KEY: local
+      AWS_ACCESS_KEY_ID: "${LOCAL_AWS_ACCESS_KEY_ID:?LOCAL_AWS_ACCESS_KEY_ID is required}"
+      AWS_SECRET_ACCESS_KEY: "${LOCAL_AWS_SECRET_ACCESS_KEY:?LOCAL_AWS_SECRET_ACCESS_KEY is required}"
       AWS_DEFAULT_REGION: us-east-1
     entrypoint: ["/bin/sh", "-c"]
     command:
@@ -79,23 +79,24 @@ services:
       ASPNETCORE_URLS: http://+:8080
       AWS__Region: us-east-1
       AWS__ServiceURL: http://dynamodb-local:8000
-      AWS_ACCESS_KEY_ID: local
-      AWS_SECRET_ACCESS_KEY: local
+      AWS_ACCESS_KEY_ID: "${LOCAL_AWS_ACCESS_KEY_ID:?LOCAL_AWS_ACCESS_KEY_ID is required}"
+      AWS_SECRET_ACCESS_KEY: "${LOCAL_AWS_SECRET_ACCESS_KEY:?LOCAL_AWS_SECRET_ACCESS_KEY is required}"
       DynamoDb__GamesTable: Games
-      Jwt__Secret: "your-super-secret-key-at-least-32-characters-long!"
+      Jwt__Secret: "${JWT_SECRET:?JWT_SECRET is required}"
       Jwt__Issuer: "ms-users-api"
       Jwt__Audience: "ms-users-api-client"
       Jwt__KeyId: "ms-users-api-signing-key"
       RabbitMq__Host: rabbitmq
       RabbitMq__Port: "5672"
-      RabbitMq__Username: admin
-      RabbitMq__Password: admin123
+      RabbitMq__Username: "${RABBITMQ_USERNAME:?RABBITMQ_USERNAME is required}"
+      RabbitMq__Password: "${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD is required}"
       RabbitMq__VirtualHost: fiap
       RabbitMq__ExchangeName: fiap.events
       RabbitMq__PaymentQueueName: payment-queue
       Elasticsearch__Url: http://elasticsearch:9200
       Elasticsearch__IndexName: games
-      Redis__ConnectionString: redis:6379
+      Redis__Host: redis
+      Redis__Port: "6379"
       Redis__InstanceName: "games-api:"
       Cache__GamesListKey: games:list
       Cache__GamesListTtlSeconds: "300"
